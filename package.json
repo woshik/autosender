@@ -1,7 +1,7 @@
 {
   "name": "auto-sender",
   "version": "1.0.0",
-  "description": "Identical IT cpa auto sender application",
+  "description": "auto gmail sender application",
   "main": "store.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

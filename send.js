@@ -1,14 +1,27 @@
 const xlsx = require('xlsx');
 const {google} = require('googleapis');
+const fs = require('fs');
+const path = require('path');
+
 const senderBook = xlsx.readFile(path.join(__dirname, 'emails', 'emails.xlsx'));
 const senderSheet = senderBook.SheetNames;
-
 let senderRow = xlsx.utils.sheet_to_json(senderBook.Sheets[senderSheet[0]]);
 
-const leadBook = xlsx.readFile(path.join(__dirname, 'emails', 'emails.xlsx'));
+const leadBook = xlsx.readFile(path.join(__dirname, 'emails', 'leads.xlsx'));
 const leadSheet = leadBook.SheetNames;
-
 let leadRow = xlsx.utils.sheet_to_json(leadBook.Sheets[leadSheet[0]]);
+
+var mailSubject, mailBody, sendCount = 50;
+
+fs.readFile(path.join(__dirname, 'config.json'), (err, res) => {
+    if (err) {
+        console.log('config file not found');
+    }
+    res = JSON.parse(res);
+    mailSubject = res.mailSubject;
+    mailBody = res.mailBody;
+    sendCount = res.sendFromPerMail;
+});
 
 senderRow.map(function(value) {
     const oAuth2Client = new google.auth.OAuth2(value.client_id, value.client_secret, value.redirect_uris);
