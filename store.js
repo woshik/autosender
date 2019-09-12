@@ -69,6 +69,7 @@ function storeEmails(auth) {
       'client_secret': client_secret,
       'redirect_uris': redirect_uris,
       'access_token': clientToken.access_token,
+      'refresh_token': clientToken.refresh_token,
       'scope': clientToken.scope,
       'token_type': clientToken.token_type,
       'expiry_date': clientToken.expiry_date,

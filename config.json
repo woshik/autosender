@@ -1,6 +1,6 @@
 {
     "sendFromPerMail": 50,
-    "mailSendInterval": 2000,
+    "mailSendInterval": 4,
     "mailSubject": "Hello",
     "mailBody": "simple text message"
 }
