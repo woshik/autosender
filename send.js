@@ -77,7 +77,7 @@ require('getmac').getMac(function(err, macAddress){
             var email_lines = [];
             email_lines.push(`From: ${senderEmail}`);
             email_lines.push(`To: ${leadMail.lead}`);
-            email_lines.push('Content-type: text/html;charset=iso-8859-1');
+            email_lines.push('Content-type: text/plain;charset=iso-8859-1');
             email_lines.push('MIME-Version: 1.0');
             email_lines.push(`Subject: ${mailSubject}`);
             email_lines.push('');
