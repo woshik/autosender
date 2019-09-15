@@ -1,6 +1,6 @@
 {
-    "sendFromPerMail": 50,
-    "mailSendInterval": 4,
+    "sendFromPerMail": 200,
+    "mailSendInterval": 5,
     "mailSubject": "Hello",
-    "mailBody": "simple text message"
+    "mailBody": "Where r u from if real knock here stepha.niel.oftus.6796@gmail.com"
 }

@@ -9,6 +9,7 @@
   "author": "Woshikuzzaman Anik",
   "license": "ISC",
   "dependencies": {
+    "getmac": "^1.4.6",
     "googleapis": "^43.0.0",
     "xlsx": "^0.15.1"
   }
