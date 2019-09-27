@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 var flag = false;
 
-require('getmac').getMac(function(err, macAddress){
+require('getmac').getMac(function(err, macAddress) {
     if (err)  throw err;
     let computer = fs.readFileSync(path.join(__dirname, 'computerAuth.txt'), 'utf8');
     
@@ -14,6 +14,7 @@ require('getmac').getMac(function(err, macAddress){
 
     const xlsx = require('xlsx');
     const {google} = require('googleapis');
+    const nodemailer = require('nodemailer');
 
     const senderBook = xlsx.readFile(path.join(__dirname, 'emails', 'emails.xlsx'));
     const senderSheet = senderBook.SheetNames;
@@ -46,18 +47,20 @@ require('getmac').getMac(function(err, macAddress){
         senderRow.map(function(value) {
             let oAuth2Client = new google.auth.OAuth2(value.client_id, value.client_secret, value.redirect_uris);
             oAuth2Client.setCredentials({
-                access_token    : value.access_token,
                 refresh_token   : value.refresh_token,
-                scope           : value.scope,
-                token_type      : value.token_type,
-                expiry_date     : value.expiry_date
             });
-            gmail = google.gmail({version: 'v1', auth: oAuth2Client});
-            sendEmail(value.email);
+
+            oAuth2Client.getAccessToken()
+            .then(accessToken => {
+                sendEmail(value, accessToken.token);
+            })
+            .catch(err => {
+               //console.log('token err :'+err.message);
+            })
         });
     });
 
-    function sendEmail(senderEmail) {
+    function sendEmail(senderInfo, accessToken) {
         
         var i = 0;
 
@@ -74,29 +77,32 @@ require('getmac').getMac(function(err, macAddress){
                 process.exit(1);
             }
 
-            var email_lines = [];
-            email_lines.push(`From: ${senderEmail}`);
-            email_lines.push(`To: ${leadMail.lead}`);
-            email_lines.push('Content-type: text/plain;charset=iso-8859-1');
-            email_lines.push('MIME-Version: 1.0');
-            email_lines.push(`Subject: ${mailSubject}`);
-            email_lines.push('');
-            email_lines.push(mailBody);
-          
-            var email = email_lines.join('\r\n').trim();
-
-            var base64EncodedEmail = new Buffer.from(email).toString('base64');
-            base64EncodedEmail = base64EncodedEmail.replace(/\+/g, '-').replace(/\//g, '_');
-            
-            gmail.users.messages.send({
-                userId: 'me',
-                resource: {
-                    raw: base64EncodedEmail
+            let smtpTransport = nodemailer.createTransport({
+                host: 'smtp.gmail.com',
+                port: 465,
+                secure: true,
+                auth: {
+                    type: "OAuth2",
+                    user: senderInfo.email, 
+                    clientId: senderInfo.client_id,
+                    clientSecret: senderInfo.client_secret,
+                    refreshToken: senderInfo.refresh_token,
+                    accessToken: accessToken
                 }
-            }, (err, res) => {
-                if (err) return console.log('The API returned an error: ' + err);
-                console.log(`From ${senderEmail} To ${leadMail.lead}`);
             });
+
+            smtpTransport.sendMail({
+                from: senderInfo.email,
+                to: leadMail.lead,
+                subject: mailSubject,
+                text: mailBody
+            })
+            .then(result => {
+                console.log(`From ${senderInfo.email} To ${leadMail.lead}`);
+            })
+            .catch(err => {
+                console.log('sending err :'+err.message);
+            })
 
             i++;
 
